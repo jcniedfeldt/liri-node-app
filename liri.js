@@ -17,6 +17,7 @@ var keys = require("./keys");
 var Spotify = require('node-spotify-api');
 var spotify = new Spotify(keys.spotify);
 var moment = require('moment');
+const fs = require("fs");
 moment().format();
 
 
@@ -67,10 +68,59 @@ if (command === "concert-this") {
 
 } else if (command === "movie-this") {
     printDebug("Processing movie-this...");
+    movie = "Mr. Nobody";
+    if (args.length>0) {
+        movie = args.join("+");
+    }
+
+    let query = "http://www.omdbapi.com/?apikey=trilogy&t=" + movie + "&type=movie";
+    axios.get(query)
+        .then(function (response) {
+            // console.log(response.data);
+            let data=response.data;
+            printDebug(response);
+
+            let ratings={imdb:'N/A',
+                    rt:'N/A'};
+            data.Ratings.forEach(rating => {
+                if (rating.Source==="Internet Movie Database"){
+                    ratings.imdb=rating.Value;
+                }
+                if (rating.Source==="Rotten Tomatoes"){
+                    ratings.rt=rating.Value;
+                }
+                
+            });
+
+            console.log(`\n* Title: ${data.Title}`);
+            console.log(`* Year: ${data.Year}`);
+            console.log(`* Rating (IMDB): ${ratings.imdb}`);
+            console.log(`* Rating (R.T.): ${ratings.rt}`);
+            console.log(`* Country: ${data.Country}`);
+            console.log(`* Language: ${data.Language}`);
+            console.log(`* Plot: ${data.Plot}`);
+            console.log(`* Actors: ${data.Actors}`);
+
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 
 } else if (command === "do-what-it-says") {
     printDebug("Processing do-what-it-says...");
     // TODO if an argument is passed, it's an error
+    if (args.length>0){
+        throw "do-what-it-says command does not accept arguments."
+    }
+    fs.open('./random.txt','r',(err,fd) => {
+        if (err) throw err;
+
+        console.log(fd);
+
+        fs.close(fd,(err)=>{
+            if (err) throw err;
+        })
+    });
 
 } else {
     printDebug("Not a valid argument.");
