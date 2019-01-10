@@ -77,14 +77,14 @@ The necessary NPM packages include:
 ### concert-this
 `node liri.js concert-this Maroon 5`
 
-![concert-this Example](img/concert-this.png)
+![concert-this Example](img/concert-this.PNG)
 
 ### movie-this
 `node liri.js movie-this Ice Age`
-![movie-this Example](img/movie-this.png)
+![movie-this Example](img/movie-this.PNG)
 ### spotify-this-song
 `node liri.js spotify-this-song Sound of Silence`
-![spotify-this-song Example](img/spotify-this-song.png)
+![spotify-this-song Example](img/spotify-this-song.PNG)
 ### do-what-it-says
 `node liri.js do-what-it-says`
-![do-what-it-says Example](img/do-what-it-says.png)
+![do-what-it-says Example](img/do-what-it-says.PNG)
