@@ -25,8 +25,7 @@ moment().format();
 //TODO combine all the arguments into one string
 printDebug(`Inputs:\n  command: ${command}\n  args:    ${args.join(',')}`);
 
-// concert-this, spotify-this-song, movie-this, do-what-it-says
-if (command === "concert-this") {
+function concert_this(args) {
     printDebug("Processing concert-this...");
     artist = args.join("+");
     let query = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
@@ -45,7 +44,9 @@ if (command === "concert-this") {
         .catch(function (error) {
             console.log(error);
         });
-} else if (command === "spotify-this-song") {
+}
+
+function spotify_this_song(args) {
     printDebug("Processing spotify-this-song...");
     let song = "The Sign";
     if (args.length > 0) {
@@ -66,10 +67,11 @@ if (command === "concert-this") {
         // console.log(data.tracks.items[0].artists);
     });
 
-} else if (command === "movie-this") {
+}
+function movie_this(args) {
     printDebug("Processing movie-this...");
     movie = "Mr. Nobody";
-    if (args.length>0) {
+    if (args.length > 0) {
         movie = args.join("+");
     }
 
@@ -77,19 +79,21 @@ if (command === "concert-this") {
     axios.get(query)
         .then(function (response) {
             // console.log(response.data);
-            let data=response.data;
+            let data = response.data;
             printDebug(response);
 
-            let ratings={imdb:'N/A',
-                    rt:'N/A'};
+            let ratings = {
+                imdb: 'N/A',
+                rt: 'N/A'
+            };
             data.Ratings.forEach(rating => {
-                if (rating.Source==="Internet Movie Database"){
-                    ratings.imdb=rating.Value;
+                if (rating.Source === "Internet Movie Database") {
+                    ratings.imdb = rating.Value;
                 }
-                if (rating.Source==="Rotten Tomatoes"){
-                    ratings.rt=rating.Value;
+                if (rating.Source === "Rotten Tomatoes") {
+                    ratings.rt = rating.Value;
                 }
-                
+
             });
 
             console.log(`\n* Title: ${data.Title}`);
@@ -106,23 +110,64 @@ if (command === "concert-this") {
             console.log(error);
         });
 
-} else if (command === "do-what-it-says") {
-    printDebug("Processing do-what-it-says...");
-    // TODO if an argument is passed, it's an error
-    if (args.length>0){
-        throw "do-what-it-says command does not accept arguments."
-    }
-    fs.open('./random.txt','r',(err,fd) => {
-        if (err) throw err;
-
-        console.log(fd);
-
-        fs.close(fd,(err)=>{
-            if (err) throw err;
-        })
-    });
-
-} else {
-    printDebug("Not a valid argument.");
-    // TODO raise an exception
 }
+
+// concert-this, spotify-this-song, movie-this, do-what-it-says
+function runCommand(command, args) {
+
+    if (command === "concert-this") {
+        concert_this(args);
+    } else if (command === "spotify-this-song") {
+        spotify_this_song(args);
+    } else if (command === "movie-this") {
+        movie_this(args);
+    } else if (command === "do-what-it-says") {
+        printDebug("Processing do-what-it-says...");
+        // TODO if an argument is passed, it's an error
+        if (args.length > 0) {
+            throw "do-what-it-says command does not accept arguments."
+        }
+        let cmdArray = [];
+        fs.readFile('./random.txt', 'utf8', (err, data) => {
+            if (err) throw err;
+
+            //split the data based on new line
+            let cmdArray = data.split('\n');
+            for (let i = 0; i < cmdArray.length; i++) {
+                let obj={};
+                try {
+                    obj = {};
+                    [obj.command, argstr] = cmdArray[i].split(',');
+                    obj.args = argstr.split('"')[1].split(" ");
+
+                } catch (error) {
+                    obj={command:"",args:[]};
+                }
+                cmdArray[i] = obj;
+            }
+            // console.log(cmdArray);
+            cmdArray.forEach(commandObj => {
+                runCommand(commandObj.command,commandObj.args);
+            //split based on space
+            // console.log(cmdArray);
+            // console.log(data);
+        });
+            // if (commandObj.command === "concert-this") {
+            //     concert_this(commandObj.args)
+            // } else if (commandObj.command === "spotify-this-song") {
+            //     spotify_this_song(commandObj.args)
+            // } else if (commandObj.command === "movie-this") {
+            //     movie_this(commandObj.args)
+            // } else if (commandObj.command === ""){
+            // }else {
+            //     throw `command ${commandObj.command} is not a valid command.`;
+            // }
+        });
+
+    } else {
+        printDebug("Not a valid argument.");
+        // TODO raise an exception
+    }
+}
+
+runCommand(command, args);
