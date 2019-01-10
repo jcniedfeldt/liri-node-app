@@ -1,6 +1,8 @@
 // LIRI
 // Purpose is to to take in parameters and search multiple databases for relevant results
 DEBUG = false;
+logfile="log.txt";
+console.log("");
 
 function printDebug(arg) {
     if (DEBUG) {
